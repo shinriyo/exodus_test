@@ -76,10 +76,10 @@ fn main() {
         <td></td>
     </tr>
     <tr ng-repeat="{0} in {0}s">
-        <td>{{movie.title}}</td>
+        <td>{{{0}.title}}</td>
         <td>
-            <a class="btn btn-primary" ui-sref="viewMovie({{id:{0}._id}})">View</a>
-            <a class="btn btn-danger"  ng-click="deleteMovie({0})">Delete</a>
+            <a class="btn btn-primary" ui-sref="view{1}({{id:{0}._id}})">View</a>
+            <a class="btn btn-danger"  ng-click="delete{1}({0})">Delete</a>
         </td>
     </tr>
 </table>
@@ -171,17 +171,17 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
 //    fixlters.js
 
     let mut js_services_f = File::create(format!("{}/services.js", js_path)).unwrap();
-    let js_services_raw = r#"angular.module('movieApp.services',[]).factory('Movie',function($resource){
-    return $resource('http://localhost:6767/api/movies/:id',{id:'@_id'},{
-        update: {
+    let js_services_raw = format!(r#"angular.module('{0}App.services',[]).factory('{1}',function($resource){{
+    return $resource('http://localhost:6767/api/{0}s/:id',{{id:'@_id'}},{{
+        update: {{
             method: 'PUT'
-        }
-    });
-}).service('popupService',function($window){
-    this.showPopup=function(message){
+        }}
+    }});
+}}).service('popupService',function($window){{
+    this.showPopup=function(message){{
         return $window.confirm(message);
-    }
-});"#;
+    }}
+}});"#, name, "Movie");
     js_services_f.write_all(js_services_raw.as_bytes());
 
     // movie/views/index.tpl
