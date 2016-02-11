@@ -19,29 +19,29 @@ fn main() {
     // ファイル
     // partials/_form.html
     let mut form_f = File::create(format!("{}/{}_form.html", partials_path, name)).unwrap();
-    let form_raw = r#"<div class="form-group">
+    let form_raw = format!(r#"<div class="form-group">
     <label for="title" class="col-sm-2 control-label">Title</label>
     <div class="col-sm-10">
-        <input type="text" ng-model="movie.title" class="form-control" id="title" placeholder="Movie Title Here"/>
+        <input type="text" ng-model="{0}.title" class="form-control" id="title" placeholder="Movie Title Here"/>
     </div>
 </div>
 <div class="form-group">
     <label for="year" class="col-sm-2 control-label">Release Year</label>
     <div class="col-sm-10">
-        <input type="text" ng-model="movie.releaseYear" class="form-control" id="year" placeholder="When was the movie released?"/>
+        <input type="text" ng-model="{0}.releaseYear" class="form-control" id="year" placeholder="When was the {0} released?"/>
     </div>
 </div>
 <div class="form-group">
     <label for="director" class="col-sm-2 control-label">Director</label>
     <div class="col-sm-10">
-        <input type="text" ng-model="movie.director" class="form-control" id="director" placeholder="Who directed the movie?"/>
+        <input type="text" ng-model="{0}.director" class="form-control" id="director" placeholder="Who directed the {0}?"/>
     </div>
 </div>
 
 <div class="form-group">
-    <label for="plot" class="col-sm-2 control-label">Movie Genre</label>
+    <label for="plot" class="col-sm-2 control-label">{1} Genre</label>
     <div class="col-sm-10">
-        <input type="text" ng-model="movie.genre" class="form-control" id="plot" placeholder="Movie genre here"/>
+        <input type="text" ng-model="{0}.genre" class="form-control" id="plot" placeholder="{1} genre here"/>
     </div>
 </div>
 
@@ -49,7 +49,7 @@ fn main() {
     <div class="col-sm-offset-2 col-sm-10">
         <input type="submit" class="btn btn-primary" value="Save"/>
     </div>
-</div>"#;
+</div>"#, name, "Movie");
     form_f.write_all(form_raw.as_bytes());
 
     // partials/hoge-add.html
