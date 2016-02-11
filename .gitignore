@@ -20,4 +20,4 @@ Cargo.lock
 assets
 movie
 hoge
-src/mod.rc
+src/mod.rs

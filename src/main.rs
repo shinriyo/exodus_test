@@ -238,7 +238,7 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
     /*
     Rustコード
     */
-    let index_tpl_path = format!("{}/views", name);
+    let index_tpl_path = "src";
     match fs::create_dir_all(&index_tpl_path) {
         Err(why) => println!("! {:?}", why.kind()),
         Ok(_) => {},
@@ -246,6 +246,6 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
 
     let rust_raw = r#"TODO:
     "#;
-    let mut rust_f = File::create(format!("{}/mod.rc", &index_tpl_path)).unwrap();
+    let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
