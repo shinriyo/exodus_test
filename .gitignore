@@ -19,3 +19,5 @@ Cargo.lock
 # テストで生成されるので
 assets
 movie
+hoge
+src/mod.rc

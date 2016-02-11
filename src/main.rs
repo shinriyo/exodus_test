@@ -185,13 +185,13 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
 
     // movie/views/index.tpl
     // フォルダ生成
-    let index_tpl_path = "movie/views";
-    match fs::create_dir_all(partials_path) {
+    let index_tpl_path = format!("{}/views", name);
+    match fs::create_dir_all(&index_tpl_path) {
         Err(why) => println!("! {:?}", why.kind()),
         Ok(_) => {},
     }
 
-    let mut index_t = File::create(format!("{}/index.tpl", index_tpl_path)).unwrap();
+    let mut index_t = File::create(format!("{}/index.tpl", &index_tpl_path)).unwrap();
     let index_raw = r#"<!DOCTYPE html>
 <html data-ng-app="movieApp">
 <head lang="en">
@@ -234,4 +234,18 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
 </body>
 </html>"#;
     index_t.write_all(index_raw.as_bytes());
+
+    /*
+    Rustコード
+    */
+    let index_tpl_path = format!("{}/views", name);
+    match fs::create_dir_all(&index_tpl_path) {
+        Err(why) => println!("! {:?}", why.kind()),
+        Ok(_) => {},
+    }
+
+    let rust_raw = r#"TODO:
+    "#;
+    let mut rust_f = File::create(format!("{}/mod.rc", &index_tpl_path)).unwrap();
+    rust_f.write_all(rust_raw .as_bytes());
 }
