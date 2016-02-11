@@ -98,29 +98,29 @@ fn main() {
     // ファイル
     // app.js
     let mut js_app_f = File::create(format!("{}/app.js", js_path)).unwrap();
-    let js_app_raw = r#"angular.module('movieApp',['ui.router','ngResource','movieApp.controllers','movieApp.services']);
-angular.module('movieApp').config(function($stateProvider,$httpProvider){
-    $stateProvider.state('{0}s',{
+    let js_app_raw = format!(r#"angular.module('{0}App',['ui.router','ngResource','{0}App.controllers','{0}App.services']);
+angular.module('{0}App').config(function($stateProvider,$httpProvider){{
+    $stateProvider.state('{0}s',{{
         url:'/{0}s',
-        templateUrl:'{0}/partials/movies.html',
-        controller:'MovieListController'
-    }).state('viewMovie',{
+        templateUrl:'{0}/partials/{0}s.html',
+        controller:'{1}ListController'
+    }}).state('view{1}',{{
        url:'/{0}s/:id/view',
-       templateUrl:'{0}/partials/movie-view.html',
-       controller:'MovieViewController'
-    }).state('newMovie',{
+       templateUrl:'{0}/partials/{0}-view.html',
+       controller:'{1}ViewController'
+    }}).state('new{1}',{{
         url:'/{0}s/new',
-        templateUrl:'{0}/partials/movie-add.html',
-        controller:'MovieCreateController'
-    }).state('editMovie',{
+        templateUrl:'{0}/partials/{0}-add.html',
+        controller:'{1}CreateController'
+    }}).state('edit{1}',{{
         url:'/{0}s/:id/edit',
-        templateUrl:'{0}/partials/movie-edit.html',
-        controller:'MovieEditController'
-    });
-}).run(function($state){
+        templateUrl:'{0}/partials/{0}-edit.html',
+        controller:'{1}EditController'
+    }});
+}}).run(function($state){{
    $state.go('{0}s');
-});
-"#;
+}});
+"#, name, "Movie");
     js_app_f.write_all(form_raw.as_bytes());
 
     let mut js_controllers_f = File::create(format!("{}/controller.js", js_path)).unwrap();
@@ -270,7 +270,6 @@ struct Movie {
 }
 
 pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {
-    // テーブル準備
     let conn = shared_connection.clone();
     router.get("/setup/movie", middleware! { |_, response|
 
@@ -285,7 +284,6 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {
     &[]) {
             // http://www.rust-ci.org/Indiv0/paste/doc/nickel/struct.Response.html
             Ok(_) => return response.send("Movie table was created."),
-            // エラー
             Err(err) => return response.send(format!("Error running query: {:?}", err))
         };
     });
