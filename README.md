@@ -20,6 +20,17 @@ exodus init
 exodus g item name:string price:integer description:text
 ```
 
+## テーブル生成
+```
+
+```
+
+## テーブル削除
+```
+
+```
+
+
 ここにプルリクやアドバイス次第で変わります
 
 TODO:

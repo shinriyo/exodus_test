@@ -54,35 +54,36 @@ fn main() {
 
     // partials/hoge-add.html
     let mut add_f = File::create(format!("{}/{}-add.html", partials_path, name)).unwrap();
-    let add_raw = r#"<form class="form-horizontal" role="form" ng-submit="addMovie()">
-    <div ng-include="'partials/_form.html'"></div>
-</form>"#;
+    let add_raw = format!(r#"<form class="form-horizontal" role="form" ng-submit="addMovie()">
+    <div ng-include="'{}/partials/_form.html'"></div>
+</form>"#, name);
     add_f.write_all(add_raw.as_bytes());
 
     // partials/hoge-edit.html
     let mut edit_f = File::create(format!("{}/{}-edit.html", partials_path, name)).unwrap();
-    let add_raw = r#"<form class="form-horizontal" role="form" ng-submit="updateMovie()">
-    <div ng-include="'partials/_form.html'"></div>
-</form>"#;
+    let add_raw = format!(r#"<form class="form-horizontal" role="form" ng-submit="updateMovie()">
+    <div ng-include="'{}/partials/_form.html'"></div>
+</form>"#, name);
     edit_f.write_all(add_raw.as_bytes());
 
     // 複数形
     // まだ仮実装
     let mut index_f = File::create(format!("{}/{}s.html", partials_path, name)).unwrap();
-    let index_raw = r#"<a ui-sref="newMovie" class="btn-primary btn-lg nodecoration">Add New Movie</a>
-<table class="table movietable">
+    let index_raw = format!(r#"<a ui-sref="newMovie" class="btn-primary btn-lg nodecoration">Add New {1}</a>
+<table class="table {0}table">
     <tr>
-        <td><h3>All Movies</h3></td>
+        <td><h3>All {1}s</h3></td>
         <td></td>
     </tr>
-    <tr ng-repeat="movie in movies">
+    <tr ng-repeat="{0} in {0}s">
         <td>{{movie.title}}</td>
         <td>
-            <a class="btn btn-primary" ui-sref="viewMovie({id:movie._id})">View</a>
-            <a class="btn btn-danger"  ng-click="deleteMovie(movie)">Delete</a>
+            <a class="btn btn-primary" ui-sref="viewMovie({{id:{0}._id}})">View</a>
+            <a class="btn btn-danger"  ng-click="deleteMovie({0})">Delete</a>
         </td>
     </tr>
-</table>"#;
+</table>
+"#, name, "Movie");
     index_f.write_all(index_raw.as_bytes());
 
     /*
@@ -98,28 +99,28 @@ fn main() {
     // app.js
     let mut js_app_f = File::create(format!("{}/app.js", js_path)).unwrap();
     let js_app_raw = r#"angular.module('movieApp',['ui.router','ngResource','movieApp.controllers','movieApp.services']);
-
 angular.module('movieApp').config(function($stateProvider,$httpProvider){
-    $stateProvider.state('movies',{
-        url:'/movies',
-        templateUrl:'partials/movies.html',
+    $stateProvider.state('{0}s',{
+        url:'/{0}s',
+        templateUrl:'{0}/partials/movies.html',
         controller:'MovieListController'
     }).state('viewMovie',{
-       url:'/movies/:id/view',
-       templateUrl:'partials/movie-view.html',
+       url:'/{0}s/:id/view',
+       templateUrl:'{0}/partials/movie-view.html',
        controller:'MovieViewController'
     }).state('newMovie',{
-        url:'/movies/new',
-        templateUrl:'partials/movie-add.html',
+        url:'/{0}s/new',
+        templateUrl:'{0}/partials/movie-add.html',
         controller:'MovieCreateController'
     }).state('editMovie',{
-        url:'/movies/:id/edit',
-        templateUrl:'partials/movie-edit.html',
+        url:'/{0}s/:id/edit',
+        templateUrl:'{0}/partials/movie-edit.html',
         controller:'MovieEditController'
     });
 }).run(function($state){
-   $state.go('movies');
-});"#;
+   $state.go('{0}s');
+});
+"#;
     js_app_f.write_all(form_raw.as_bytes());
 
     let mut js_controllers_f = File::create(format!("{}/controller.js", js_path)).unwrap();
@@ -192,14 +193,14 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
     }
 
     let mut index_t = File::create(format!("{}/index.tpl", &index_tpl_path)).unwrap();
-    let index_raw = r#"<!DOCTYPE html>
+    let index_raw = format!(r#"<!DOCTYPE html>
 <html data-ng-app="movieApp">
 <head lang="en">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="/"/>
-    <title>The Movie App</title>
+    <title>The {1} App</title>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/app.css"/>
 </head>
@@ -207,11 +208,11 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
     <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" ui-sref="movies">The Movie App</a>
+                <a class="navbar-brand" ui-sref="movies">The {1} App</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a ui-sref="movies">Home</a></li>
+                    <li class="active"><a ui-sref="{0}s">Home</a></li>
                 </ul>
             </div>
         </div>
@@ -224,15 +225,15 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
         </div>
     </div>
     <script type="text/javascript" src="lib/angular.min.js"></script>
-    <script type="text/javascript" src="movie/js/app.js"></script>
-    <script type="text/javascript" src="movie/js/controllers.js"></script>
-    <script type="text/javascript" src="movie/js/services.js"></script>
-    <script type="text/javascript" src="movie/js/directives.js"></script>
-    <script type="text/javascript" src="movie/js/filters.js"></script>
+    <script type="text/javascript" src="{0}/js/app.js"></script>
+    <script type="text/javascript" src="{0}/js/controllers.js"></script>
+    <script type="text/javascript" src="{0}/js/services.js"></script>
+    <script type="text/javascript" src="{0}/js/directives.js"></script>
+    <script type="text/javascript" src="{0}/js/filters.js"></script>
     <script type="text/javascript" src="lib/angular-ui-router.min.js"></script>
     <script type="text/javascript" src="lib/angular-resource.min.js"></script>
 </body>
-</html>"#;
+</html>"#, name, "Movie");
     index_t.write_all(index_raw.as_bytes());
 
     /*
@@ -244,8 +245,198 @@ angular.module('movieApp').config(function($stateProvider,$httpProvider){
         Ok(_) => {},
     }
 
-    let rust_raw = r#"TODO:
-    "#;
+    let rust_raw = r#"extern crate postgres;
+extern crate openssl;
+extern crate hyper;
+use nickel::{Router, HttpRouter, MediaType, JsonBody};
+use nickel::status::StatusCode;
+use postgres::{Connection};
+use std::sync::{Arc, Mutex};
+
+use std::vec::Vec;
+
+// json化
+extern crate rustc_serialize;
+use rustc_serialize::{json};
+
+// モデル
+#[derive(RustcDecodable, RustcEncodable)]
+struct Movie {
+    _id: Option<i32>,
+    title: String,
+    director: String,
+    releaseYear: i16,
+    genre: String,
+}
+
+pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {
+    // テーブル準備
+    let conn = shared_connection.clone();
+    router.get("/setup/movie", middleware! { |_, response|
+
+    // also print to stdout
+    return match conn.lock().unwrap().execute("CREATE TABLE Movie (
+            id          SERIAL PRIMARY KEY,
+            title       VARCHAR (50) NOT NULL,
+            releaseYear SMALLINT NOT NULL,
+            director    VARCHAR (18) NOT NULL,
+            genre       VARCHAR (50) NOT NULL
+        )",
+    &[]) {
+            // http://www.rust-ci.org/Indiv0/paste/doc/nickel/struct.Response.html
+            Ok(_) => return response.send("Movie table was created."),
+            // エラー
+            Err(err) => return response.send(format!("Error running query: {:?}", err))
+        };
+    });
+
+    // APIs
+    router.get("/", middleware! { |_, mut response|
+        response.set(MediaType::Html);
+        return response.send_file("app/movie/views/index.tpl")
+    });
+
+    // select all
+    let conn = shared_connection.clone();
+    router.get("/api/movies", middleware! { |_, mut response|
+        let conn = conn.lock().unwrap();
+        let movies = conn.query("select id, title, releaseYear, director, genre from movie", &[]).unwrap();
+        let mut v: Vec<Movie> = vec![];
+
+        for row in &movies {
+            let movie = Movie {
+                _id: row.get(0),
+                title: row.get(1),
+                releaseYear: row.get(2),
+                director: row.get(3),
+                genre: row.get(4),
+            };
+
+            v.push(movie);
+        }
+
+        let json_obj = json::encode(&v).unwrap();
+        // MediaType can be any valid type for reference see
+        response.set(MediaType::Json);
+        response.set(StatusCode::Ok);
+        return response.send(json_obj);
+    });
+
+    // insert
+    let conn = shared_connection.clone();
+    router.post("/api/movies", middleware! { |request, mut response|
+        let conn = conn.lock().unwrap();
+        let stmt = match conn.prepare("insert into movie (title, releaseYear, director, genre)
+            values ($1, $2, $3, $4)") {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                return response.send(format!("Preparing query failed: {}", e));
+            }
+        };
+
+        let movie = request.json_as::<Movie>().unwrap();
+        match stmt.execute(&[
+            &movie.title.to_string(),
+            &movie.releaseYear,
+            &movie.director.to_string(),
+            &movie.genre.to_string()
+        ]) {
+            Ok(_) => {
+                println!("Inserting movie was Success.");
+                response.set(StatusCode::Ok);
+            },
+            Err(e) => println!("Inserting movie failed. => {:?}", e),
+        };
+
+        return response.send("");
+    });
+
+    // select one
+    let conn = shared_connection.clone();
+    router.get("/api/movies/:id", middleware! { |request, mut response|
+        let conn = conn.lock().unwrap();
+        let movie = conn.query(
+            "select id, title, releaseYear, director, genre from movie where id = $1",
+            // param string to int
+            &[&request.param("id").unwrap().parse::<i32>().unwrap()]
+        ).unwrap();
+
+        // movie
+        for row in &movie {
+            let movie = Movie {
+                _id: row.get(0),
+                title: row.get(1),
+                releaseYear: row.get(2),
+                director: row.get(3),
+                genre: row.get(4),
+            };
+
+            let json_obj = json::encode(&movie).unwrap();
+            // MediaType can be any valid type for reference see
+            response.set(MediaType::Json);
+            response.set(StatusCode::Ok);
+            return response.send(json_obj);
+        }
+    });
+
+    // update
+    let conn = shared_connection.clone();
+    router.put("/api/movies/:id", middleware! { |request, mut response|
+        let conn = conn.lock().unwrap();
+        let stmt = match conn.prepare("update movie set title=$1, releaseYear=$2,
+            director=$3, genre=$4
+            where id = $5") {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                return response.send(format!("Preparing query failed: {}", e));
+            }
+        };
+
+        // JSON to object
+        let movie = request.json_as::<Movie>().unwrap();
+        match stmt.execute(&[
+            &movie.title.to_string(),
+            &movie.releaseYear,
+            &movie.director.to_string(),
+            &movie.genre.to_string(),
+            &movie._id
+        ]) {
+            Ok(_) => {
+                println!("Updating movie was Success.");
+                response.set(StatusCode::Ok);
+            },
+            Err(e) => println!("Updating movie failed. => {:?}", e),
+        };
+
+        return response.send("");
+    });
+
+    // delete
+    // curl http://localhost:6767/api/movies/1 -X DELETE
+    let conn = shared_connection.clone();
+    router.delete("/api/movies/:id", middleware! { |request, mut response|
+        let conn = conn.lock().unwrap();
+        let stmt = match conn.prepare("delete from movie where id = $1") {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                return response.send(format!("Preparing query failed: {}", e));
+            }
+        };
+
+        match stmt.execute(&[
+            // param string to int
+            &request.param("id").unwrap().parse::<i32>().unwrap()
+        ]) {
+            Ok(_) => {
+                println!("Deleting movie was Success.");
+                response.set(StatusCode::Ok);
+            },
+            Err(e) => println!("Deleting movie failed. => {:?}", e),
+        };
+
+        return response.send("");
+    });
+}"#;
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
