@@ -12,6 +12,7 @@ fn main() {
 
     // 後で変える名前
     let name = "hoge";
+    let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
 
     /*
         HTML系のファイルたち
@@ -233,7 +234,7 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
     <script type="text/javascript" src="lib/angular-ui-router.min.js"></script>
     <script type="text/javascript" src="lib/angular-resource.min.js"></script>
 </body>
-</html>"#, name, "Movie");
+</html>"#, name, capitalized_name);
     index_t.write_all(index_raw.as_bytes());
 
     /*
