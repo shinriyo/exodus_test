@@ -125,47 +125,47 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
     js_app_f.write_all(form_raw.as_bytes());
 
     let mut js_controllers_f = File::create(format!("{}/controller.js", js_path)).unwrap();
-    let js_controllers_raw = r#"angular.module('movieApp.controllers',[]).controller('MovieListController',function($scope,$state,popupService,$window,Movie){
+    let js_controllers_raw = format!(r#"angular.module('{0}App.controllers',[]).controller('{1}ListController',function($scope,$state,popupService,$window,{1}){{
 
-    $scope.movies=Movie.query();
+    $scope.{0}s={1}.query();
 
-    $scope.deleteMovie=function(movie){
-        if(popupService.showPopup('Really delete this?')){
-            movie.$delete(function(){
+    $scope.delete{1}=function({0}){{
+        if(popupService.showPopup('Really delete this?')){{
+            {0}.$delete(function(){{
                 $window.location.href='';
-            });
-        }
-    }
+            }});
+        }}
+    }}
 
-}).controller('MovieViewController',function($scope,$stateParams,Movie){
+}}).controller('{1}ViewController',function($scope,$stateParams,{1}){{
 
-    $scope.movie=Movie.get({id:$stateParams.id});
+    $scope.{0}={1}.get({{id:$stateParams.id}});
 
-}).controller('MovieCreateController',function($scope,$state,$stateParams,Movie){
+}}).controller('{1}CreateController',function($scope,$state,$stateParams,{1}){{
 
-    $scope.movie=new Movie();
+    $scope.{0}=new {1}();
 
-    $scope.addMovie=function(){
-        $scope.movie.$save(function(){
-            $state.go('movies');
-        });
-    }
+    $scope.add{1}=function(){{
+        $scope.{0}.$save(function(){{
+            $state.go('{0}s');
+        }});
+    }}
 
-}).controller('MovieEditController',function($scope,$state,$stateParams,Movie){
+}}).controller('{1}EditController',function($scope,$state,$stateParams,{1}){{
 
-    $scope.updateMovie=function(){
-        $scope.movie.$update(function(){
-            $state.go('movies');
-        });
-    };
+    $scope.update{1}=function(){{
+        $scope.{0}.$update(function(){{
+            $state.go('{0}s');
+        }});
+    }};
 
-    $scope.loadMovie=function(){
-        $scope.movie=Movie.get({id:$stateParams.id});
-    };
+    $scope.load{1}=function(){{
+        $scope.{0}={1}.get({{id:$stateParams.id}});
+    }};
 
-    $scope.loadMovie();
-});
-"#;
+    $scope.load{1}();
+}});
+"#, name, capitalized_name);
     js_controllers_f.write_all(js_controllers_raw.as_bytes());
 
 //    directives.js
