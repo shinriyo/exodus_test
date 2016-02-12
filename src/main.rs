@@ -50,7 +50,7 @@ fn main() {
     <div class="col-sm-offset-2 col-sm-10">
         <input type="submit" class="btn btn-primary" value="Save"/>
     </div>
-</div>"#, name, "Movie");
+</div>"#, name, capitalized_name);
     form_f.write_all(form_raw.as_bytes());
 
     // partials/hoge-add.html
@@ -84,7 +84,7 @@ fn main() {
         </td>
     </tr>
 </table>
-"#, name, "Movie");
+"#, name, capitalized_name);
     index_f.write_all(index_raw.as_bytes());
 
     /*
@@ -121,7 +121,7 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
 }}).run(function($state){{
    $state.go('{0}s');
 }});
-"#, name, "Movie");
+"#, name, capitalized_name);
     js_app_f.write_all(form_raw.as_bytes());
 
     let mut js_controllers_f = File::create(format!("{}/controller.js", js_path)).unwrap();
@@ -182,7 +182,7 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
     this.showPopup=function(message){{
         return $window.confirm(message);
     }}
-}});"#, name, "Movie");
+}});"#, name, capitalized_name);
     js_services_f.write_all(js_services_raw.as_bytes());
 
     // movie/views/index.tpl
