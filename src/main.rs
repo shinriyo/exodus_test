@@ -1,29 +1,56 @@
-extern crate regex;
-
 use std::fs;
 use std::io::prelude::*;
 use std::fs::File;
-use regex::Regex;
+use std::env;
 use std::collections::HashMap;
 
 fn main() {
-    // 正規表現
-    let re = Regex::new(r"(\d{4})-(\d{2})-(\d{2})").unwrap();
-    let text = "2012-03-14, 2013-01-01 and 2014-07-05";
-    for cap in re.captures_iter(text) {
-        println!("Month: {} Day: {} Year: {}",
-        cap.at(2).unwrap_or(""), cap.at(3).unwrap_or(""),
-        cap.at(1).unwrap_or(""));
+    // exodus g item name:string price:integer description:text
+    let suffix;
+    let x = 3;
+    match (x % 10, x % 100) {
+        (1, 1) | (1, 21...91) => {
+            suffix = "st";
+        }
+        (2, 2) | (2, 22...92) => {
+            suffix = "nd";
+        }
+        (3, 3) | (3, 23...93) => {
+            suffix = "rd";
+        }
+        _                     => {
+            suffix = "th";
+        }
+    }
+    println!("{}{}", x, suffix);
+
+    // 後で変える名前
+    let name = "hoge";
+    let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
+    let args: Vec<_> = env::args().collect();
+    if args.len() < 0 {
+        println!("Error.");
+        return;
+    }
+    for argument in env::args() {
+        println!("{}", argument);
     }
 
     // ハッシュ
     let mut map = HashMap::new();
-    map.insert("a", 1);
-    map.insert("b", 2);
-    map.insert("c", 3);
+    map.insert("year", "integer");
+    map.insert("name", "string");
 
-    for val in map.values() {
-        println!("{}", val);
+    for (key, val) in &map {
+        let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
+        let raw = format!(r#"<div class="form-group">
+<div class="form-group">
+    <label for="{1}" class="col-sm-2 control-label">{2}</label>
+    <div class="col-sm-10">
+        <input type="text" ng-model="{0}.{1}" class="form-control" id="{1}" placeholder="{0}'s {2}"/>
+    </div>
+</div>"#, name, key, capitalized_val);
+        println!("{}", raw);
     }
 
     // 開始
@@ -33,10 +60,6 @@ fn main() {
         Err(why) => println!("! {:?}", why.kind()),
         Ok(_) => {},
     }
-
-    // 後で変える名前
-    let name = "hoge";
-    let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
 
     /*
         HTML系のファイルたち
