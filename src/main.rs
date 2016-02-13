@@ -1,8 +1,32 @@
+extern crate regex;
+
 use std::fs;
 use std::io::prelude::*;
 use std::fs::File;
+use regex::Regex;
+use std::collections::HashMap;
 
 fn main() {
+    // 正規表現
+    let re = Regex::new(r"(\d{4})-(\d{2})-(\d{2})").unwrap();
+    let text = "2012-03-14, 2013-01-01 and 2014-07-05";
+    for cap in re.captures_iter(text) {
+        println!("Month: {} Day: {} Year: {}",
+        cap.at(2).unwrap_or(""), cap.at(3).unwrap_or(""),
+        cap.at(1).unwrap_or(""));
+    }
+
+    // ハッシュ
+    let mut map = HashMap::new();
+    map.insert("a", 1);
+    map.insert("b", 2);
+    map.insert("c", 3);
+
+    for val in map.values() {
+        println!("{}", val);
+    }
+
+    // 開始
     // フォルダ生成
     let partials_path = "assets/partials";
     match fs::create_dir_all(partials_path) {
@@ -32,6 +56,7 @@ fn main() {
         <input type="text" ng-model="{0}.releaseYear" class="form-control" id="year" placeholder="When was the {0} released?"/>
     </div>
 </div>
+
 <div class="form-group">
     <label for="director" class="col-sm-2 control-label">Director</label>
     <div class="col-sm-10">
