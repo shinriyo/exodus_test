@@ -36,6 +36,14 @@ fn main() {
         println!("{}", argument);
     }
 
+    let x = "year:integer".to_string();
+    let d: Vec<_> = x.split(':').collect();
+    if d.len() != 2 {
+        println!("format");
+    }
+    println!("{}", d[0]);
+    println!("{}", d[1]);
+
     // ハッシュ
     let mut map = HashMap::new();
     map.insert("year", "integer");
