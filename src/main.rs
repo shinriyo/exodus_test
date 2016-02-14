@@ -69,7 +69,14 @@ fn main() {
         }
         else if arg_idx == 1 {
             // コマンド名
+            // "g" or "generate"
             command_name = argument.to_string();
+            if command_name == "g" || command_name == "g" {
+                println!("Generate Scaffolding");
+            } else {
+                println!("Command Error.");
+                return;
+            }
         }
         else if arg_idx == 2 {
             // モデル名
