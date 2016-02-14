@@ -59,19 +59,24 @@ fn main() {
     // UPDATE
     let mut update_sql_as_str: Vec<String> = Vec::new();
 
+    // params
+    let mut params_sql_as_str: Vec<String> = Vec::new();
+
     let mut idx = 0;
 
     // key: column name
     // おそらく&&str
     for (key, val) in &map {
         let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
-        let raw = format!(r#"<div class="form-group">
+        let raw = format!(r#"
+<div class="form-group">
 <div class="form-group">
     <label for="{1}" class="col-sm-2 control-label">{2}</label>
     <div class="col-sm-10">
         <input type="text" ng-model="{0}.{1}" class="form-control" id="{1}" placeholder="{0}'s {2}"/>
     </div>
-</div>"#, name, key, capitalized_val);
+</div>
+"#, name, key, capitalized_val);
         farm_html_as_str.push(raw);
 
         let mut comma = ", ";
@@ -114,11 +119,14 @@ fn main() {
         let raw = format!("{0}=${1}{2}", key, idx+1, comma);
         update_sql_as_str.push(raw);
 
-        // update_sql_as_str
+        // sql用のparam
+        let raw = format!("{0}: row.get({1}){2}", key, idx+1, comma);
+        params_sql_as_str.push(raw);
+
         idx += 1;
     }
 
-    println!("{}", farm_html_as_str.iter().cloned().collect::<String>());
+    // println!("{}", farm_html_as_str.iter().cloned().collect::<String>());
 
     // CREATE TABLE
     println!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
@@ -138,6 +146,8 @@ fn main() {
     println!("UPDATE {1} SET {0} WHERE id = ${2}", update_sql_as_str.iter().cloned().collect::<String>(),
         name, map.len() + 1);
 
+    // SQLのparams
+    let sql_params = format!("_id: row.get(0), {}", params_sql_as_str.iter().cloned().collect::<String>());
 
     // 開始
     // フォルダ生成
@@ -409,11 +419,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
 
         for row in &{0}s {{
             let {0} = {1} {{
-                _id: row.get(0),
-                title: row.get(1),
-                releaseYear: row.get(2),
-                director: row.get(3),
-                genre: row.get(4),
+                {2}
             }};
 
             v.push({0});
@@ -465,11 +471,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
 
         for row in &{0} {{
             let {0} = {1} {{
-                _id: row.get(0),
-                title: row.get(1),
-                releaseYear: row.get(2),
-                director: row.get(3),
-                genre: row.get(4),
+                {2}
             }};
 
             let json_obj = json::encode(&{0}).unwrap();
@@ -536,7 +538,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name);
+"#, name, capitalized_name, sql_params);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
