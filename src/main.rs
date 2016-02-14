@@ -25,6 +25,12 @@ fn main() {
         return;
     }
 
+    let path = Path::new("src/main.rs");
+    if !path.exists() {
+        println!("No src/main.rs file Error.");
+        return;
+    }
+
     let path = Path::new("Cargo.toml");
     if !path.exists() {
         println!("No Cargo.toml Error.");
@@ -71,10 +77,10 @@ fn main() {
             // コマンド名
             // "g" or "generate"
             command_name = argument.to_string();
-            if command_name == "g" || command_name == "g" {
+            if command_name == "g" || command_name == "generate" {
                 println!("Generate Scaffolding");
             } else {
-                println!("Command Error.");
+                println!("{} command not found.", command_name);
                 return;
             }
         }
