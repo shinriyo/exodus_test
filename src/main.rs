@@ -135,7 +135,7 @@ fn main() {
     println!("{}", create_table_val_as_str.iter().cloned().collect::<String>());
 
     // SELECT ALL
-    println!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
+    let select_sql = format!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
 
     // INSERT
     println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
@@ -414,7 +414,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.get("/api/{0}s", middleware! {{ |_, mut response|
         let conn = conn.lock().unwrap();
-        let {0}s = conn.query("SELECT id, title, releaseYear, director, genre from {0}", &[]).unwrap();
+        let {0}s = conn.query("{3}", &[]).unwrap();
         let mut v: Vec<{1}> = vec![];
 
         for row in &{0}s {{
@@ -465,7 +465,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     router.get("/api/{0}s/:id", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
         let {0} = conn.query(
-            "SELECT id, title, releaseYear, director, genre from {0} WHERE id = $1",
+            "{3} WHERE id = $1",
             &[&request.param("id").unwrap().parse::<i32>().unwrap()]
         ).unwrap();
 
@@ -538,7 +538,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name, sql_params);
+"#, name, capitalized_name, sql_params, select_sql);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
