@@ -17,24 +17,6 @@ fn string_to_static_str(s: String) -> &'static str {
 
 fn main() {
     // exodus g item name:string price:integer description:text
-    let suffix;
-    let x = 3;
-    match (x % 10, x % 100) {
-        (1, 1) | (1, 21...91) => {
-            suffix = "st";
-        }
-        (2, 2) | (2, 22...92) => {
-            suffix = "nd";
-        }
-        (3, 3) | (3, 23...93) => {
-            suffix = "rd";
-        }
-        _                     => {
-            suffix = "th";
-        }
-    }
-    println!("{}{}", x, suffix);
-
     // 後で変える名前
     let name = "hoge";
     let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
@@ -43,6 +25,7 @@ fn main() {
         println!("Error.");
         return;
     }
+
     for argument in env::args() {
         println!("{}", argument);
     }
@@ -62,18 +45,19 @@ fn main() {
     map.insert("genre", "string");
     map.insert("director", "string");
 
-    let mut as_str: Vec<String> = Vec::new();
+    // partials/_form.html用
+    let mut farm_html_as_str: Vec<String> = Vec::new();
 
     // CREATE TABLE
-    let mut create_table_str: Vec<String> = Vec::new();
+    let mut create_table_as_str: Vec<String> = Vec::new();
     // $1, $2, $3, $4
-    let mut create_table_val_str: Vec<String> = Vec::new();
+    let mut create_table_val_as_str: Vec<String> = Vec::new();
 
     // SELECT
     let mut select_table_str: Vec<String> = Vec::new();
 
     // UPDATE
-    let mut update_str: Vec<String> = Vec::new();
+    let mut update_sql_as_str: Vec<String> = Vec::new();
 
     let mut idx = 0;
 
@@ -88,7 +72,7 @@ fn main() {
         <input type="text" ng-model="{0}.{1}" class="form-control" id="{1}" placeholder="{0}'s {2}"/>
     </div>
 </div>"#, name, key, capitalized_val);
-        as_str.push(raw);
+        farm_html_as_str.push(raw);
 
         let mut comma = ", ";
         if (map.len() - 1) == idx {
@@ -115,13 +99,12 @@ fn main() {
             }
         }
 
-        // TODO: あとは SMALLINT, VARCHAR変換
         let raw = format!("{0} {1} (50) NOT NULL{2}",
             key, val_type, comma);
-        create_table_str.push(raw);
+        create_table_as_str.push(raw);
 
         let raw = format!("${0}{1}", idx+1, comma);
-        create_table_val_str.push(raw);
+        create_table_val_as_str.push(raw);
 
         // SELECT
         let raw = format!("{0}{1}", key, comma);
@@ -129,19 +112,19 @@ fn main() {
 
         // UPDATE
         let raw = format!("{0}=${1}{2}", key, idx+1, comma);
-        update_str.push(raw);
+        update_sql_as_str.push(raw);
 
-        // update_str
+        // update_sql_as_str
         idx += 1;
     }
 
-    println!("{}", as_str.iter().cloned().collect::<String>());
+    println!("{}", farm_html_as_str.iter().cloned().collect::<String>());
 
     // CREATE TABLE
     println!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
-        name, create_table_str.iter().cloned().collect::<String>());
+        name, create_table_as_str.iter().cloned().collect::<String>());
 
-    println!("{}", create_table_val_str.iter().cloned().collect::<String>());
+    println!("{}", create_table_val_as_str.iter().cloned().collect::<String>());
 
     // SELECT ALL
     println!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
@@ -149,10 +132,10 @@ fn main() {
     // INSERT
     println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
         name,
-        create_table_val_str.iter().cloned().collect::<String>());
+        create_table_val_as_str.iter().cloned().collect::<String>());
 
     // UPDATE
-    println!("UPDATE {1} SET {0} WHERE id = ${2}", update_str.iter().cloned().collect::<String>(),
+    println!("UPDATE {1} SET {0} WHERE id = ${2}", update_sql_as_str.iter().cloned().collect::<String>(),
         name, map.len() + 1);
 
 
@@ -170,38 +153,13 @@ fn main() {
     // ファイル
     // partials/_form.html
     let mut form_f = File::create(format!("{}/{}_form.html", partials_path, name)).unwrap();
-    let form_raw = format!(r#"<div class="form-group">
-    <label for="title" class="col-sm-2 control-label">Title</label>
-    <div class="col-sm-10">
-        <input type="text" ng-model="{0}.title" class="form-control" id="title" placeholder="{1} Title Here"/>
-    </div>
-</div>
-<div class="form-group">
-    <label for="year" class="col-sm-2 control-label">Release Year</label>
-    <div class="col-sm-10">
-        <input type="text" ng-model="{0}.releaseYear" class="form-control" id="year" placeholder="When was the {0} released?"/>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="director" class="col-sm-2 control-label">Director</label>
-    <div class="col-sm-10">
-        <input type="text" ng-model="{0}.director" class="form-control" id="director" placeholder="Who directed the {0}?"/>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="plot" class="col-sm-2 control-label">{1} Genre</label>
-    <div class="col-sm-10">
-        <input type="text" ng-model="{0}.genre" class="form-control" id="plot" placeholder="{1} genre here"/>
-    </div>
-</div>
+    let form_raw = format!(r#"{}
 
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <input type="submit" class="btn btn-primary" value="Save"/>
     </div>
-</div>"#, name, capitalized_name);
+</div>"#, farm_html_as_str.iter().cloned().collect::<String>());
     form_f.write_all(form_raw.as_bytes());
 
     // partials/hoge-add.html
