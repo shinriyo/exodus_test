@@ -36,7 +36,7 @@ fn main() {
         println!("{}", argument);
     }
 
-    let x = "year:integer".to_string();
+    let x = "release_year:integer".to_string();
     let d: Vec<_> = x.split(':').collect();
     if d.len() != 2 {
         println!("format");
@@ -47,7 +47,7 @@ fn main() {
     // ハッシュ
     let mut map = HashMap::new();
     map.insert("title", "string");
-    map.insert("year", "integer");
+    map.insert("release_year", "integer");
     map.insert("genre", "string");
     map.insert("director", "string");
 
@@ -55,10 +55,14 @@ fn main() {
 
     // create table用
     let mut create_table_str: Vec<String> = Vec::new();
-    //$1, $2, $3, $4
+    // $1, $2, $3, $4
     let mut create_table_val_str: Vec<String> = Vec::new();
 
+    // SELECT id, title, releaseYear, director, genre from {0}", &[]).unwrap();
+    let mut celect_table_str: Vec<String> = Vec::new();
+
     let mut idx = 0;
+
     // key: column name
     for (key, val) in &map {
         let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
@@ -76,21 +80,32 @@ fn main() {
             comma = "";
         }
 
-        let raw = format!(r#" {0} {1} (50) NOT NULL{2}"#,
+        // CREATE TABLE
+        // TODO: あとは SMALLINT, VARCHAR変換
+        let raw = format!(" {0} {1} (50) NOT NULL{2}",
             key, "integer", comma);
         create_table_str.push(raw);
 
-        let raw = format!(r#"${0}{1}"#, idx+1, comma);
+        let raw = format!("${0}{1}", idx+1, comma);
         create_table_val_str.push(raw);
+
+        // SELECT TABLE
+        let raw = format!(" {0}{1}", key, comma);
+        celect_table_str.push(raw);
+
         idx += 1;
     }
 
     println!("{}", as_str.iter().cloned().collect::<String>());
 
+    // CREATE TABLE
     println!("CREATE TABLE {0} ( id SERIAL PRIMARY KEY,{1})",
         name, create_table_str.iter().cloned().collect::<String>());
 
     println!("{}", create_table_val_str.iter().cloned().collect::<String>());
+
+    // SELECT
+    println!("SELECT{0} FROM {1}", celect_table_str.iter().cloned().collect::<String>(), name);
 
     // 開始
     // フォルダ生成
@@ -382,7 +397,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.get("/api/{0}s", middleware! {{ |_, mut response|
         let conn = conn.lock().unwrap();
-        let {0}s = conn.query("select id, title, releaseYear, director, genre from {0}", &[]).unwrap();
+        let {0}s = conn.query("SELECT id, title, releaseYear, director, genre from {0}", &[]).unwrap();
         let mut v: Vec<{1}> = vec![];
 
         for row in &{0}s {{
@@ -407,8 +422,8 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.post("/api/{0}s", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
-        let stmt = match conn.prepare("insert into {0} (title, releaseYear, director, genre)
-            values ($1, $2, $3, $4)") {{
+        let stmt = match conn.prepare("INSERT INTO {0} (title, releaseYear, director, genre)
+            VALUES ($1, $2, $3, $4)") {{
             Ok(stmt) => stmt,
             Err(e) => {{
                 return response.send(format!("Preparing query failed: {{}}", e));
@@ -462,9 +477,9 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.put("/api/{0}s/:id", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
-        let stmt = match conn.prepare("update {0} set title=$1, releaseYear=$2,
+        let stmt = match conn.prepare("UPDATE {0} SET title=$1, releaseYear=$2,
             director=$3, genre=$4
-            where id = $5") {{
+            WHERE id = $5") {{
             Ok(stmt) => stmt,
             Err(e) => {{
                 return response.send(format!("Preparing query failed: {{}}", e));
