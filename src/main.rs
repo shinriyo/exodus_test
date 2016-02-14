@@ -16,9 +16,6 @@ fn string_to_static_str(s: String) -> &'static str {
 
 fn main() {
     // exodus g item name:string price:integer description:text
-    // 後で変える名前
-    let name = "hoge";
-    let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
     let args: Vec<_> = env::args().collect();
     if args.len() < 0 {
         println!("Error.");
@@ -36,18 +33,31 @@ fn main() {
     println!("{}", d[1]);
     */
 
+    // 後で変える名前
+    let name = "hoge";
+
+
+
     // ハッシュ
     let mut map = HashMap::new();
+    /**/
     map.insert("title", "string");
     map.insert("release_year", "integer");
     map.insert("genre", "string");
     map.insert("director", "string");
-
+    /**/
+    let mut arg_idx = 0;
     for argument in env::args() {
+        if arg_idx == 0 {
+
+        }
 //        let mut arg_str = format!("{}", argument);
 //        let d: Vec<_> = arg_str.as_str().split(':').collect();
 //        map.insert(d[0], d[1]);
     }
+
+    // 大文字最初の名前
+    let capitalized_name = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
 
     // partials/_form.html用
     let mut farm_html_as_str: Vec<String> = Vec::new();
