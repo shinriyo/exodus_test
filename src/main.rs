@@ -138,7 +138,7 @@ fn main() {
     let select_sql = format!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
 
     // INSERT
-    println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
+    let insert_sql = format!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
         name,
         create_table_val_as_str.iter().cloned().collect::<String>());
 
@@ -435,8 +435,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.post("/api/{0}s", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
-        let stmt = match conn.prepare("INSERT INTO {0} (title, releaseYear, director, genre)
-            VALUES ($1, $2, $3, $4)") {{
+        let stmt = match conn.prepare("{4}") {{
             Ok(stmt) => stmt,
             Err(e) => {{
                 return response.send(format!("Preparing query failed: {{}}", e));
@@ -538,7 +537,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name, sql_params, select_sql);
+"#, name, capitalized_name, sql_params, select_sql, insert_sql);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
