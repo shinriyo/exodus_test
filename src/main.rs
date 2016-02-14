@@ -36,8 +36,6 @@ fn main() {
     // 後で変える名前
     let name = "hoge";
 
-
-
     // ハッシュ
     let mut map = HashMap::new();
     /**/
@@ -47,13 +45,16 @@ fn main() {
     map.insert("director", "string");
     /**/
     let mut arg_idx = 0;
-    for argument in env::args() {
+    let args: Vec<String> = env::args().collect();
+    for argument in args {
         if arg_idx == 0 {
-
+//            name = argument.as_str();
+        } else {
+            let d:Vec<_> = argument.split(':').collect();
+//            println!("{}", d[0]);
         }
-//        let mut arg_str = format!("{}", argument);
-//        let d: Vec<_> = arg_str.as_str().split(':').collect();
-//        map.insert(d[0], d[1]);
+
+        arg_idx+=1;
     }
 
     // 大文字最初の名前
