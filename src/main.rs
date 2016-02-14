@@ -112,8 +112,8 @@ fn main() {
 
     println!("{}", create_table_val_str.iter().cloned().collect::<String>());
 
-    // SELECT
-    println!("SELECT {0} FROM {1}", select_table_str.iter().cloned().collect::<String>(), name);
+    // SELECT ALL
+    println!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
 
     // INSERT
     println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
@@ -470,7 +470,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     router.get("/api/{0}s/:id", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
         let {0} = conn.query(
-            "select id, title, releaseYear, director, genre from {0} where id = $1",
+            "SELECT id, title, releaseYear, director, genre from {0} WHERE id = $1",
             &[&request.param("id").unwrap().parse::<i32>().unwrap()]
         ).unwrap();
 
@@ -527,7 +527,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.delete("/api/{0}s/:id", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
-        let stmt = match conn.prepare("delete from {0} where id = $1") {{
+        let stmt = match conn.prepare("DELETE FROM {0} WHERE id = $1") {{
             Ok(stmt) => stmt,
             Err(e) => {{
                 return response.send(format!("Preparing query failed: {{}}", e));
