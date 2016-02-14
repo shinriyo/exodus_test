@@ -55,6 +55,8 @@ fn main() {
 
     // create table用
     let mut create_table_str: Vec<String> = Vec::new();
+    //$1, $2, $3, $4
+    let mut create_table_val_str: Vec<String> = Vec::new();
 
     let mut idx = 0;
     // key: column name
@@ -77,6 +79,9 @@ fn main() {
         let raw = format!(r#" {0} {1} (50) NOT NULL{2}"#,
             key, "integer", comma);
         create_table_str.push(raw);
+
+        let raw = format!(r#"${0}{1}"#, idx+1, comma);
+        create_table_val_str.push(raw);
         idx += 1;
     }
 
@@ -85,9 +90,7 @@ fn main() {
     println!("CREATE TABLE {0} ( id SERIAL PRIMARY KEY,{1})",
         name, create_table_str.iter().cloned().collect::<String>());
 
-//$1, $2, $3, $4
-
-    let mut as_str: Vec<String> = Vec::new();
+    println!("{}", create_table_val_str.iter().cloned().collect::<String>());
 
     // 開始
     // フォルダ生成
