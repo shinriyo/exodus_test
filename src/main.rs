@@ -4,6 +4,8 @@ use std::fs::File;
 use std::env;
 use std::collections::HashMap;
 use std::mem;
+use std::fs::metadata;
+use std::path::Path;
 
 // 普通のstringをstaticに変換
 fn string_to_static_str(s: String) -> &'static str {
@@ -16,8 +18,21 @@ fn string_to_static_str(s: String) -> &'static str {
 
 fn main() {
     // exodus g item name:string price:integer description:text
+    // カレントパスにsrcフォルダやCargo.tomlあるか？
+    let path = Path::new("src");
+    if !path.exists() {
+        println!("No src folder Error.");
+        return;
+    }
+
+    let path = Path::new("Cargo.toml");
+    if !path.exists() {
+        println!("No Cargo.toml Error.");
+        return;
+    }
+
     let args: Vec<_> = env::args().collect();
-    if args.len() <= 1 {
+    if args.len() <= 3 {
         println!("Error.");
         return;
     }
@@ -35,6 +50,7 @@ fn main() {
 
     // 後で変える名前
     let mut name = "hoge".to_string();
+    let mut command_name = "g".to_string();
 
     // ハッシュ
     let mut map = HashMap::new();
@@ -51,7 +67,12 @@ fn main() {
         if arg_idx == 0 {
             // これはこのスクリプトの名前
         }
-        else if arg_idx == 0 {
+        else if arg_idx == 1 {
+            // コマンド名
+            command_name = argument.to_string();
+        }
+        else if arg_idx == 2 {
+            // モデル名
             name = argument.to_string();
 //            println!("model name: {}", name);
         } else {
