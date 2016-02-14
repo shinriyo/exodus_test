@@ -53,13 +53,13 @@ fn main() {
 
     let mut as_str: Vec<String> = Vec::new();
 
-    // create table用
+    // CREATE TABLE
     let mut create_table_str: Vec<String> = Vec::new();
     // $1, $2, $3, $4
     let mut create_table_val_str: Vec<String> = Vec::new();
 
-    // SELECT id, title, releaseYear, director, genre from {0}", &[]).unwrap();
-    let mut celect_table_str: Vec<String> = Vec::new();
+    // SELECT
+    let mut select_table_str: Vec<String> = Vec::new();
 
     let mut idx = 0;
 
@@ -75,23 +75,23 @@ fn main() {
 </div>"#, name, key, capitalized_val);
         as_str.push(raw);
 
-        let mut comma = ",";
+        let mut comma = ", ";
         if (map.len() - 1) == idx {
             comma = "";
         }
 
         // CREATE TABLE
         // TODO: あとは SMALLINT, VARCHAR変換
-        let raw = format!(" {0} {1} (50) NOT NULL{2}",
+        let raw = format!("{0} {1} (50) NOT NULL{2}",
             key, "integer", comma);
         create_table_str.push(raw);
 
         let raw = format!("${0}{1}", idx+1, comma);
         create_table_val_str.push(raw);
 
-        // SELECT TABLE
-        let raw = format!(" {0}{1}", key, comma);
-        celect_table_str.push(raw);
+        // SELECT
+        let raw = format!("{0}{1}", key, comma);
+        select_table_str.push(raw);
 
         idx += 1;
     }
@@ -99,13 +99,18 @@ fn main() {
     println!("{}", as_str.iter().cloned().collect::<String>());
 
     // CREATE TABLE
-    println!("CREATE TABLE {0} ( id SERIAL PRIMARY KEY,{1})",
+    println!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
         name, create_table_str.iter().cloned().collect::<String>());
 
     println!("{}", create_table_val_str.iter().cloned().collect::<String>());
 
     // SELECT
-    println!("SELECT{0} FROM {1}", celect_table_str.iter().cloned().collect::<String>(), name);
+    println!("SELECT {0} FROM {1}", select_table_str.iter().cloned().collect::<String>(), name);
+
+    // INSERT
+    println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
+        name,
+        create_table_val_str.iter().cloned().collect::<String>());
 
     // 開始
     // フォルダ生成
