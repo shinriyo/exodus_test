@@ -17,7 +17,7 @@ fn string_to_static_str(s: String) -> &'static str {
 fn main() {
     // exodus g item name:string price:integer description:text
     let args: Vec<_> = env::args().collect();
-    if args.len() < 0 {
+    if args.len() <= 1 {
         println!("Error.");
         return;
     }
@@ -34,24 +34,30 @@ fn main() {
     */
 
     // 後で変える名前
-    let name = "hoge";
+    let mut name = "hoge".to_string();
 
     // ハッシュ
     let mut map = HashMap::new();
-    /**/
+    /*
     map.insert("title", "string");
     map.insert("release_year", "integer");
     map.insert("genre", "string");
     map.insert("director", "string");
-    /**/
+    */
     let mut arg_idx = 0;
     let args: Vec<String> = env::args().collect();
+
     for argument in args {
         if arg_idx == 0 {
-//            name = argument.as_str();
+            // これはこのスクリプトの名前
+        }
+        else if arg_idx == 0 {
+            name = argument.to_string();
+//            println!("model name: {}", name);
         } else {
             let d:Vec<_> = argument.split(':').collect();
 //            println!("{}", d[0]);
+            map.insert(d[0].to_string(), d[1].to_string());
         }
 
         arg_idx+=1;
