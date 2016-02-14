@@ -61,6 +61,9 @@ fn main() {
     // SELECT
     let mut select_table_str: Vec<String> = Vec::new();
 
+    // UPDATE
+    let mut update_str: Vec<String> = Vec::new();
+
     let mut idx = 0;
 
     // key: column name
@@ -93,6 +96,11 @@ fn main() {
         let raw = format!("{0}{1}", key, comma);
         select_table_str.push(raw);
 
+        // UPDATE
+        let raw = format!("{0}=${1}{2}", key, idx+1, comma);
+        update_str.push(raw);
+
+        // update_str
         idx += 1;
     }
 
@@ -111,6 +119,11 @@ fn main() {
     println!("INSERT INTO {1} ({0}) VALUES ({2})", select_table_str.iter().cloned().collect::<String>(),
         name,
         create_table_val_str.iter().cloned().collect::<String>());
+
+    // UPDATE
+    println!("UPDATE {1} SET {0} WHERE id = ${2}", update_str.iter().cloned().collect::<String>(),
+        name, map.len() + 1);
+
 
     // 開始
     // フォルダ生成
