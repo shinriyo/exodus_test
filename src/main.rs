@@ -4,6 +4,17 @@ use std::fs::File;
 use std::env;
 use std::collections::HashMap;
 
+
+use std::mem;
+
+fn string_to_static_str(s: String) -> &'static str {
+    unsafe {
+        let ret = mem::transmute(&s as &str);
+        mem::forget(s);
+        ret
+    }
+}
+
 fn main() {
     // exodus g item name:string price:integer description:text
     let suffix;
@@ -67,6 +78,7 @@ fn main() {
     let mut idx = 0;
 
     // key: column name
+    // おそらく&&str
     for (key, val) in &map {
         let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
         let raw = format!(r#"<div class="form-group">
@@ -84,9 +96,28 @@ fn main() {
         }
 
         // CREATE TABLE
+        let val_type;
+        // scaffolding → Postgres Type
+        let sca_key = format!("{0}", key);
+
+        match (string_to_static_str(sca_key)) {
+            "bool" => {
+                val_type = "BOOL";
+            }
+            "integer" => {
+                val_type = "SMALLINT";
+            }
+            "string" => {
+                val_type = "VARCHAR";
+            }
+            _ => {
+                val_type = "VARCHAR";
+            }
+        }
+
         // TODO: あとは SMALLINT, VARCHAR変換
         let raw = format!("{0} {1} (50) NOT NULL{2}",
-            key, "integer", comma);
+            key, val_type, comma);
         create_table_str.push(raw);
 
         let raw = format!("${0}{1}", idx+1, comma);
