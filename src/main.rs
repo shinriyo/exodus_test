@@ -143,7 +143,7 @@ fn main() {
         create_table_val_as_str.iter().cloned().collect::<String>());
 
     // UPDATE
-    println!("UPDATE {1} SET {0} WHERE id = ${2}", update_sql_as_str.iter().cloned().collect::<String>(),
+    let update_sql = format!("UPDATE {1} SET {0} WHERE id = ${2}", update_sql_as_str.iter().cloned().collect::<String>(),
         name, map.len() + 1);
 
     // SQLのparams
@@ -485,9 +485,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.put("/api/{0}s/:id", middleware! {{ |request, mut response|
         let conn = conn.lock().unwrap();
-        let stmt = match conn.prepare("UPDATE {0} SET title=$1, releaseYear=$2,
-            director=$3, genre=$4
-            WHERE id = $5") {{
+        let stmt = match conn.prepare("{5}") {{
             Ok(stmt) => stmt,
             Err(e) => {{
                 return response.send(format!("Preparing query failed: {{}}", e));
@@ -537,7 +535,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name, sql_params, select_sql, insert_sql);
+"#, name, capitalized_name, sql_params, select_sql, insert_sql, update_sql);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
