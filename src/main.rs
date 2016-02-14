@@ -51,9 +51,12 @@ fn main() {
     map.insert("genre", "string");
     map.insert("director", "string");
 
-//    let mut all_str = "";
     let mut as_str: Vec<String> = Vec::new();
 
+    // create table用
+    let mut create_table_str: Vec<String> = Vec::new();
+
+    let mut idx = 0;
     // key: column name
     for (key, val) in &map {
         let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
@@ -65,20 +68,27 @@ fn main() {
     </div>
 </div>"#, name, key, capitalized_val);
         as_str.push(raw);
+
+        let mut comma = ",";
+        if (map.len() - 1) == idx {
+            comma = "";
+        }
+
+        let raw = format!(r#" {0} {1} (50) NOT NULL{2}"#,
+            key, "integer", comma);
+        create_table_str.push(raw);
+        idx += 1;
     }
 
     println!("{}", as_str.iter().cloned().collect::<String>());
 
+    println!("CREATE TABLE {0} ( id SERIAL PRIMARY KEY,{1})",
+        name, create_table_str.iter().cloned().collect::<String>());
+
 //$1, $2, $3, $4
 
-/*
-    CREATE TABLE {1} (
-id          SERIAL PRIMARY KEY,
-title       VARCHAR (50) NOT NULL,
-releaseYear SMALLINT NOT NULL,
-director    VARCHAR (18) NOT NULL,
-genre       VARCHAR (50) NOT NULL
-*/
+    let mut as_str: Vec<String> = Vec::new();
+
     // 開始
     // フォルダ生成
     let partials_path = "assets/partials";
