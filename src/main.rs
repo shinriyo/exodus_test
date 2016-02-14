@@ -98,7 +98,7 @@ fn main() {
         // CREATE TABLE
         let val_type;
         // scaffolding → Postgres Type
-        let sca_key = format!("{0}", key);
+        let sca_key = format!("{}", val);
 
         match (string_to_static_str(sca_key)) {
             "bool" => {
