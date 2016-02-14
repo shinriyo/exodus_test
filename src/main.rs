@@ -129,7 +129,7 @@ fn main() {
     // println!("{}", farm_html_as_str.iter().cloned().collect::<String>());
 
     // CREATE TABLE
-    println!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
+    let create_table_sql = format!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
         name, create_table_as_str.iter().cloned().collect::<String>());
 
     println!("{}", create_table_val_as_str.iter().cloned().collect::<String>());
@@ -392,13 +392,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
     let conn = shared_connection.clone();
     router.get("/setup/{0}", middleware! {{ |_, response|
 
-    return match conn.lock().unwrap().execute("CREATE TABLE {1} (
-            id          SERIAL PRIMARY KEY,
-            title       VARCHAR (50) NOT NULL,
-            releaseYear SMALLINT NOT NULL,
-            director    VARCHAR (18) NOT NULL,
-            genre       VARCHAR (50) NOT NULL
-        )",
+    return match conn.lock().unwrap().execute("{6}",
     &[]) {{
             Ok(_) => return response.send("{1} table was created."),
             Err(err) => return response.send(format!("Error running query: {{:?}}", err))
@@ -535,7 +529,7 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name, sql_params, select_sql, insert_sql, update_sql);
+"#, name, capitalized_name, sql_params, select_sql, insert_sql, update_sql, create_table_sql);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
