@@ -3,10 +3,9 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::env;
 use std::collections::HashMap;
-
-
 use std::mem;
 
+// 普通のstringをstaticに変換
 fn string_to_static_str(s: String) -> &'static str {
     unsafe {
         let ret = mem::transmute(&s as &str);
@@ -26,10 +25,8 @@ fn main() {
         return;
     }
 
-    for argument in env::args() {
-        println!("{}", argument);
-    }
-
+    /*
+    パラメータ実験
     let x = "release_year:integer".to_string();
     let d: Vec<_> = x.split(':').collect();
     if d.len() != 2 {
@@ -37,6 +34,7 @@ fn main() {
     }
     println!("{}", d[0]);
     println!("{}", d[1]);
+    */
 
     // ハッシュ
     let mut map = HashMap::new();
@@ -44,6 +42,12 @@ fn main() {
     map.insert("release_year", "integer");
     map.insert("genre", "string");
     map.insert("director", "string");
+
+    for argument in env::args() {
+//        let mut arg_str = format!("{}", argument);
+//        let d: Vec<_> = arg_str.as_str().split(':').collect();
+//        map.insert(d[0], d[1]);
+    }
 
     // partials/_form.html用
     let mut farm_html_as_str: Vec<String> = Vec::new();
@@ -61,6 +65,9 @@ fn main() {
 
     // params
     let mut params_sql_as_str: Vec<String> = Vec::new();
+
+    // struct
+    let mut struct_as_str: Vec<String> = Vec::new();
 
     let mut idx = 0;
 
@@ -85,22 +92,29 @@ fn main() {
         }
 
         // CREATE TABLE
-        let val_type;
         // scaffolding → Postgres Type
-        let sca_key = format!("{}", val);
+        let val_type;
+        // scaffolding → Rust Type
+        let rest_type;
 
-        match (string_to_static_str(sca_key)) {
+        let scaffoding_val = format!("{}", val);
+
+        match (string_to_static_str(scaffoding_val)) {
             "bool" => {
                 val_type = "BOOL";
+                rest_type = "bool";
             }
             "integer" => {
                 val_type = "SMALLINT";
+                rest_type = "i16";
             }
             "string" => {
                 val_type = "VARCHAR";
+                rest_type = "String";
             }
             _ => {
                 val_type = "VARCHAR";
+                rest_type = "String";
             }
         }
 
@@ -123,16 +137,18 @@ fn main() {
         let raw = format!("{0}: row.get({1}){2}", key, idx+1, comma);
         params_sql_as_str.push(raw);
 
+        // struct
+        let raw = format!("{0}: {1}{2}", key, rest_type, comma);
+        struct_as_str.push(raw);
+
         idx += 1;
     }
-
-    // println!("{}", farm_html_as_str.iter().cloned().collect::<String>());
 
     // CREATE TABLE
     let create_table_sql = format!("CREATE TABLE {0} (id SERIAL PRIMARY KEY, {1})",
         name, create_table_as_str.iter().cloned().collect::<String>());
 
-    println!("{}", create_table_val_as_str.iter().cloned().collect::<String>());
+//    println!("{}", create_table_val_as_str.iter().cloned().collect::<String>());
 
     // SELECT ALL
     let select_sql = format!("SELECT {0} FROM {1} WHERE ", select_table_str.iter().cloned().collect::<String>(), name);
@@ -148,6 +164,8 @@ fn main() {
 
     // SQLのparams
     let sql_params = format!("_id: row.get(0), {}", params_sql_as_str.iter().cloned().collect::<String>());
+
+    println!("{}", struct_as_str.iter().cloned().collect::<String>());
 
     // 開始
     // フォルダ生成
