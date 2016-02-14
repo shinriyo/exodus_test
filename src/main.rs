@@ -46,9 +46,15 @@ fn main() {
 
     // ハッシュ
     let mut map = HashMap::new();
+    map.insert("title", "string");
     map.insert("year", "integer");
-    map.insert("name", "string");
+    map.insert("genre", "string");
+    map.insert("director", "string");
 
+//    let mut all_str = "";
+    let mut as_str: Vec<String> = Vec::new();
+
+    // key: column name
     for (key, val) in &map {
         let capitalized_val = format!("{}{}", &name[0..1].to_uppercase(), &name[1..name.len()]);
         let raw = format!(r#"<div class="form-group">
@@ -58,9 +64,21 @@ fn main() {
         <input type="text" ng-model="{0}.{1}" class="form-control" id="{1}" placeholder="{0}'s {2}"/>
     </div>
 </div>"#, name, key, capitalized_val);
-        println!("{}", raw);
+        as_str.push(raw);
     }
 
+    println!("{}", as_str.iter().cloned().collect::<String>());
+
+//$1, $2, $3, $4
+
+/*
+    CREATE TABLE {1} (
+id          SERIAL PRIMARY KEY,
+title       VARCHAR (50) NOT NULL,
+releaseYear SMALLINT NOT NULL,
+director    VARCHAR (18) NOT NULL,
+genre       VARCHAR (50) NOT NULL
+*/
     // 開始
     // フォルダ生成
     let partials_path = "assets/partials";
