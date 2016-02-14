@@ -165,7 +165,8 @@ fn main() {
     // SQLのparams
     let sql_params = format!("_id: row.get(0), {}", params_sql_as_str.iter().cloned().collect::<String>());
 
-    println!("{}", struct_as_str.iter().cloned().collect::<String>());
+    // struct
+    let struct_params = format!("{}", struct_as_str.iter().cloned().collect::<String>());
 
     // 開始
     // フォルダ生成
@@ -387,11 +388,11 @@ angular.module('{0}App').config(function($stateProvider,$httpProvider){{
     let rust_raw = format!(r#"extern crate postgres;
 extern crate openssl;
 extern crate hyper;
+
 use nickel::{{Router, HttpRouter, MediaType, JsonBody}};
 use nickel::status::StatusCode;
 use postgres::{{Connection}};
 use std::sync::{{Arc, Mutex}};
-
 use std::vec::Vec;
 
 extern crate rustc_serialize;
@@ -400,10 +401,7 @@ use rustc_serialize::{{json}};
 #[derive(RustcDecodable, RustcEncodable)]
 struct {1} {{
     _id: Option<i32>,
-    title: String,
-    director: String,
-    releaseYear: i16,
-    genre: String,
+    {7}
 }}
 
 pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
@@ -547,7 +545,9 @@ pub fn url(shared_connection: Arc<Mutex<Connection>>, router: &mut Router) {{
         return response.send("");
     }});
 }}
-"#, name, capitalized_name, sql_params, select_sql, insert_sql, update_sql, create_table_sql);
+"#,
+    name, capitalized_name, sql_params, select_sql, insert_sql, update_sql,
+    create_table_sql, struct_params);
     let mut rust_f = File::create(format!("{}/mod.rs", &index_tpl_path)).unwrap();
     rust_f.write_all(rust_raw .as_bytes());
 }
